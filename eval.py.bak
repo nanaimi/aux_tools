@@ -5,31 +5,11 @@ from mpl_toolkits import mplot3d
 import pandas as pd
 import math
 
-### tutorial for rosbag_pandas
-import rosbag_pandas
-
-# Convert a ROSBag to a dataframe
-df = rosbag_pandas.bag_to_dataframe('data/rosout.bag')
-df_exclude = rosbag_pandas.bag_to_dataframe('data/example.bag', exclude=['/scan']))
-df_include = rosbag_pandas.bag_to_dataframe('data/rosout.bag', include=['/rosout']))
-
-# Select a dataframe key based on topic and (conform msgevalgen pattern http://docs.ros.org/api/rostopic/html/)
-print(df['/rosout/header/stamp/secs'].to_string())
-
-# Obtain possible ROS topics from a selection pattern (conform msgevalgen pattern http://docs.ros.org/api/rostopic/html/)
-# This will return the possible topics: /pose, /pose/pose, /pose/pose/position
-rosbag_pandas.topics_from_keys(["/pose/pose/position/x"])
-
-### end of tutorial
-
-
-
-
-
-
 bag = rosbag.Bag('rosbags/2019-12-02-17-49-42.bag')
 
 dev = {'secs' : [], 'devx' : [], 'devy' : [], 'devz' : []}
+
+
 
 
 for topic, msg, t in bag.read_messages(topics=['/mbzirc_estimator/ekf/state']):
@@ -170,3 +150,4 @@ plt.show()
 # # plt.show()
 #
 # bag.close()
+
