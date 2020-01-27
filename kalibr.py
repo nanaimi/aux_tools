@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-from __future__ import print_function
 import numpy as np
 import tf
 
@@ -27,4 +25,3 @@ tf_p_string = "{:.4f} {:.4f} {:.4f}".format(tf_p[0], tf_p[1], tf_p[2])
 tf_publisher_string = """<node pkg="tf2_ros" type="static_transform_publisher" name="broadcaster_{body}_to_{cam}" args="{pos_string} {quat_string} {body} {cam}" />"""
 
 print(tf_publisher_string.format(cam = cam_frame_name, body = body_frame_name, quat_string = tf_q_string, pos_string = tf_p_string))
-
