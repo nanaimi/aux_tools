@@ -1,3 +1,4 @@
+# Python 2.7
 import rosbag
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,8 +7,11 @@ import pandas as pd
 import math
 import rosbag_pandas
 import os
+import shutil
 
-directory = "params____"
+### Parameters that must be set before running script
+
+set_of_bags = 'fifth_trial'
 
 ### some useful functions
 def get_columns(df):
@@ -25,29 +29,50 @@ def time_rectifier():
 
 def strip_name(str):
     newstr = ''
-    str.index('.')
+    index = str.index('.')
     newstr = str[:index]
     newstr = 'plots_' + newstr
     return newstr
 
-### Specify bag folder path and file name
+def filter_list_of_files(list):
+    list_to_remove = []
+    for file in list:
+        if file.endswith(".txt"):
+            list_to_remove.append(file)
+    for rem in list_to_remove:
+        list.remove(rem)
 
-# Parent Directory path
+def copy_settings_files_to_plot_directory(list, src_directory_path, plot_directory_path):
+    for file in list:
+        if file.endswith(".txt"):
+            print('copying {}'.format(file))
+            shutil.copy2(src_directory_path + '/' + file, plot_directory_path)
+            print('finished copying {}'.format(file))
+
+### End of function definitions
+
+### Create directory to save evaluation plots to set
 parent_dir = "/home/nasib/datasets/evaluated"
+path_plots = os.path.join(parent_dir, set_of_bags)
+os.mkdir(path_plots)
+### End
 
-# Path to plots
-path_plots = os.path.join(parent_dir, directory)
-
-os.mkdir(path)
-
-bag_path = '/home/nasib/datasets/rosbags/evaluation_sets/'
+### Specify path to directory containing rosbags for evaluation
+bag_path = "/home/nasib/datasets/rosbags/evaluation_sets/" + set_of_bags
 files_list = os.listdir(bag_path)
+print(files_list)
 
-file = 'evaluation_straight_line_2020-01-27-09-30-37.bag'
+copy_settings_files_to_plot_directory(files_list, bag_path, path_plots)
+
+filter_list_of_files(files_list)
+# filter_list_of_files(files_list)
+
+print(files_list)
+
 for file in files_list:
-
-    file_path = bag_path + file
+    file_path = bag_path + '/' + file
     plot_file = strip_name(file)
+
     ### Load all different topics into separate DataFrames
     df_tracker_states = rosbag_pandas.bag_to_dataframe(file_path, include=['/mbzirc_estimator/imm/state'])
     df_tracker_future = rosbag_pandas.bag_to_dataframe(file_path, include=['/mbzirc_estimator/imm/future'])
@@ -69,7 +94,7 @@ for file in files_list:
     ### Plot all relevant information
     plt.style.use('seaborn-whitegrid')
     fig, ax = plt.subplots(nrows=3, ncols=3)
-    fig.suptitle('Linear motion, Parameters: ')
+    fig.suptitle(plot_file)
     fig.set_size_inches(h=14, w=21)
     fig.subplots_adjust(left=0.05, bottom=0.05, right=0.95,
                         top=0.9, wspace=0.25, hspace=0.25)
@@ -174,9 +199,8 @@ for file in files_list:
     ax4.plot(df_tracker_evaluation['time'], df_tracker_evaluation['/mbzirc_estimator/imm/evaluation/cov_norm'], color='black')
     ax4.tick_params(axis='y', labelcolor='black')
     ax4.set_ylabel('Covariance Norm', color='black')
-    plt.show()
+    # plt.show()
     fig.savefig(os.path.join(path_plots, plot_file))
-
 
 # Graph Outline
 #################################################################################
